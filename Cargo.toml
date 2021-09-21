@@ -1,0 +1,11 @@
+[package]
+name = "simple-music-bot"
+version = "0.1.0"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serenity = { version = "0.10.8", default-features = false, features = ["builder", "cache", "client", "gateway", "model", "http", "utils", "unstable_discord_api", "rustls_backend", "voice"] }
+songbird = { version = "0.1.8", features = ["builtin-queue"] }
+tokio = { version = "1.10.0", features = ["macros", "rt-multi-thread"] }
