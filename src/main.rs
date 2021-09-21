@@ -2,20 +2,7 @@ use std::env;
 
 use songbird::SerenityInit;
 
-use serenity::{
-    async_trait,
-    model::{
-        gateway::Ready,
-        id::GuildId,
-        interactions::{
-            application_command::{
-                ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType,
-            },
-            Interaction, InteractionResponseType,
-        },
-    },
-    prelude::*,
-};
+use serenity::{async_trait, model::{gateway::Ready, id::GuildId, interactions::{Interaction, InteractionResponseType, application_command::{ApplicationCommand, ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType}}}, prelude::*};
 
 struct Handler;
 
