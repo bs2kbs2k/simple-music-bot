@@ -219,8 +219,7 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
 
-        let guild_command = GuildId(889800833611464734)
-            .set_application_commands(&ctx.http, |commands| {
+        let guild_command = ApplicationCommand::set_global_application_commands(&ctx.http, |commands| {
                 commands
                     .create_application_command(|command| {
                         command
