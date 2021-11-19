@@ -2,7 +2,21 @@ use std::env;
 
 use songbird::SerenityInit;
 
-use serenity::{async_trait, model::{gateway::Ready, id::GuildId, interactions::{Interaction, InteractionResponseType, application_command::{ApplicationCommand, ApplicationCommandInteractionDataOptionValue, ApplicationCommandOptionType}}}, prelude::*};
+use serenity::{
+    async_trait,
+    model::{
+        gateway::Ready,
+        id::GuildId,
+        interactions::{
+            application_command::{
+                ApplicationCommand, ApplicationCommandInteractionDataOptionValue,
+                ApplicationCommandOptionType,
+            },
+            Interaction, InteractionResponseType,
+        },
+    },
+    prelude::*,
+};
 
 struct Handler;
 
@@ -195,7 +209,11 @@ impl EventHandler for Handler {
                 _ => "E9101: HOW".to_string(),
             };
             if let Err(why) = command
-                .edit_original_interaction_response(&ctx.http, |response| response.content(content))
+                .edit_original_interaction_response(&ctx.http, |response| {
+                    response
+                        .content(content)
+                        .allowed_mentions(|mentions| mentions.empty_parse())
+                })
                 .await
             {
                 println!("Cannot respond to slash command: {}", why);
@@ -206,7 +224,8 @@ impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
 
-        let guild_command = ApplicationCommand::set_global_application_commands(&ctx.http, |commands| {
+        let guild_command =
+            ApplicationCommand::set_global_application_commands(&ctx.http, |commands| {
                 commands
                     .create_application_command(|command| {
                         command
