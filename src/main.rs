@@ -6,7 +6,6 @@ use serenity::{
     async_trait,
     model::{
         gateway::Ready,
-        id::GuildId,
         interactions::{
             application_command::{
                 ApplicationCommand, ApplicationCommandInteractionDataOptionValue,
@@ -22,7 +21,6 @@ struct Handler;
 
 #[async_trait]
 impl EventHandler for Handler {
-    #[allow(clippy::redundant_closure_call)]
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::ApplicationCommand(command) = interaction {
             if let Err(why) = command
@@ -95,7 +93,9 @@ impl EventHandler for Handler {
                             Some(call) => {
                                 let mut call = call.lock().await;
                                 call.queue().stop();
-                                call.leave().await;
+                                if call.leave().await.is_err() {
+                                    return "E9986: Couldn't leave VC".to_string();
+                                };
                                 "Successfully left call".to_string()
                             }
                             None => "Not in VC".to_string(),
@@ -115,8 +115,10 @@ impl EventHandler for Handler {
                         };
                         match manager.get(guild_id) {
                             Some(call) => {
-                                let mut call = call.lock().await;
-                                call.queue().skip();
+                                let call = call.lock().await;
+                                if call.queue().skip().is_err() {
+                                    return "E6815: Couldn't skip song".to_string()
+                                };
                                 "Successfully skipped song".to_string()
                             }
                             None => "Not in VC".to_string(),
@@ -136,8 +138,10 @@ impl EventHandler for Handler {
                         };
                         match manager.get(guild_id) {
                             Some(call) => {
-                                let mut call = call.lock().await;
-                                call.queue().pause();
+                                let call = call.lock().await;
+                                if call.queue().pause().is_err() {
+                                    return "E9883: Couldn't pause song".to_string()
+                                };
                                 "Successfully paused song".to_string()
                             }
                             None => "Not in VC".to_string(),
@@ -157,8 +161,10 @@ impl EventHandler for Handler {
                         };
                         match manager.get(guild_id) {
                             Some(call) => {
-                                let mut call = call.lock().await;
-                                call.queue().resume();
+                                let call = call.lock().await;
+                                if call.queue().resume().is_err() {
+                                    return "E2079: Couldn't resume song".to_string()
+                                };
                                 "Successfully resumed song".to_string()
                             }
                             None => "Not in VC".to_string(),
@@ -178,7 +184,7 @@ impl EventHandler for Handler {
                         };
                         match manager.get(guild_id) {
                             Some(call) => {
-                                let mut call = call.lock().await;
+                                let call = call.lock().await;
                                 let queue = call
                                     .queue()
                                     .current_queue()
@@ -190,12 +196,12 @@ impl EventHandler for Handler {
                                                 .metadata()
                                                 .title
                                                 .clone()
-                                                .unwrap_or("Unknown Song".to_string()),
+                                                .unwrap_or_else(|| "Unknown Song".to_string()),
                                             track
                                                 .metadata()
                                                 .source_url
                                                 .clone()
-                                                .unwrap_or("https://youtu.be/".to_string())
+                                                .unwrap_or_else(|| "https://youtu.be/".to_string())
                                         )
                                     })
                                     .collect::<Vec<_>>();
